@@ -188,7 +188,7 @@ fig = px.pie(
 )
 col2.plotly_chart(fig)
 
-## Nombre d'accident par condition atmospherique
+# Nombre d'accident par condition atmospherique
 
 conditionat = dataCaracteristiques[["Accident_Id", "atm"]]
 conditionat = conditionat[conditionat["atm"] > -1]
