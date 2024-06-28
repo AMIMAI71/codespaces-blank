@@ -214,7 +214,7 @@ GRAVITE = { 1: 'Indemne',
 }
  
 ATM = {
-    -1:  'Non renseigné',
+-1:  'Non renseigné',
 1: 'Normale ',
 2: 'Pluie légère',
 3: 'Pluie forte',
@@ -248,4 +248,15 @@ LUM = {
 3: 'Nuit sans éclairage public',
 4: 'Nuit avec éclairage public non allumé',
 5: 'Nuit avec éclairage public allumé'
+}
+
+COLLISION = {
+-1: 'Non renseigné',
+1: 'Deux véhicules - frontale',
+2: 'Deux véhicules – par l’arrière',
+3: 'Deux véhicules – par le coté',
+4: 'Trois véhicules et plus – en chaîne',
+5: 'Trois véhicules et plus - collisions multiples',
+6: 'Autre collision',
+7: 'Sans collision'
 }

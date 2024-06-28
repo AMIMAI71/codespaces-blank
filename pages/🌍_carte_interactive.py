@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from constantes import ROUTE_TYPE, DEPARTMENTS
+from constantes import ROUTE_TYPE, DEPARTMENTS, COLLISION, AGG, LUM, ATM
 st.set_page_config(page_title="Carte Interactive", page_icon="🌍")
 
 dataUsagers = pd.read_csv("datas/usagers.csv", sep=";")
@@ -32,29 +32,37 @@ with st.sidebar:
     else:
         filteredCaracteristiques = dataCaracteristiques
 
-    conditionsAtomospheriques = sorted(dataCaracteristiques["atm"].unique())
+    conditionsAtomospheriques = sorted(ATM.values())   
     conditionsAtomospheriques = add_all_option(conditionsAtomospheriques)
     conditionAtmospheriqueSelected = st.sidebar.selectbox(label="Condition athmosphérique", options = conditionsAtomospheriques)
     if conditionAtmospheriqueSelected != "Tous":
+        inversedDico = dict(map(reversed, ATM.items()))
+        conditionAtmospheriqueSelected = inversedDico[conditionAtmospheriqueSelected]
         filteredCaracteristiques = filteredCaracteristiques[filteredCaracteristiques["atm"] == conditionAtmospheriqueSelected]
         
-    conditionsEclairages = sorted(dataCaracteristiques["lum"].unique())
+    conditionsEclairages = sorted(LUM.values())   
     conditionsEclairages = add_all_option(conditionsEclairages)
     conditionEclairageSelected = st.sidebar.selectbox(label="Luminosité", options = conditionsEclairages)
     if conditionEclairageSelected != "Tous":
+        inversedDico = dict(map(reversed, LUM.items()))
+        localisationSelected = inversedDico[conditionEclairageSelected]
         filteredCaracteristiques = filteredCaracteristiques[filteredCaracteristiques["lum"] == conditionEclairageSelected]
 
-    localisation = sorted(dataCaracteristiques["agg"].unique())
+    localisation = sorted(AGG.values())
     localisation = add_all_option(localisation)
     localisationSelected = st.sidebar.selectbox(label="Localisation", options = localisation)
     if localisationSelected != "Tous":
-        filteredCaracteristiques = filteredCaracteristiques[filteredCaracteristiques["lum"] == localisationSelected]
+        inversedDico = dict(map(reversed, AGG.items()))
+        localisationSelected = inversedDico[localisationSelected]
+        filteredCaracteristiques = filteredCaracteristiques[filteredCaracteristiques["agg"] == localisationSelected]
 
-    colisions = sorted(dataCaracteristiques["col"].unique())
+    colisions = sorted(COLLISION.values())
     colisions = add_all_option(colisions)
-    typeColision = st.selectbox(label="Colision", options = colisions)
-    if typeColision != "Tous":
-        filteredCaracteristiques = filteredCaracteristiques[filteredCaracteristiques["col"] == typeColision]
+    selectedColision = st.selectbox(label="Colision", options = colisions)
+    if selectedColision != "Tous":
+        inversedDico = dict(map(reversed, COLLISION.items()))
+        selectedColision = inversedDico[selectedColision]
+        filteredCaracteristiques = filteredCaracteristiques[filteredCaracteristiques["col"] == selectedColision]
 
     categories = sorted(ROUTE_TYPE.values())
     categories = add_all_option(categories)
@@ -84,9 +92,12 @@ joined_df = filteredCaracteristiques.join(dataUsagers.set_index('Num_Acc'), on= 
 nombredecesjoin= len(joined_df[joined_df['grav'] == 2])
 
 #Le taux de létalité.
-letalite = (nombredecesjoin/nombreaccidentvehicule)*100
+if (nombreaccidentvehicule > 0):
+    letalite = (nombredecesjoin/nombreaccidentvehicule)*100
+else:
+    letalite = 0
 letalite_formate = f"{letalite:.2f}%"
-dataPosition = filteredCaracteristiques[['lat','long']]
+dataPosition = dataJoinedAndFiltered[['lat','long']]
 
 col1, col2, col3, col4, col5= st.columns([2,3,3,2,3])
 col1.metric(label="🚧Nombre accident", value= nombreaccidentvehicule)
