@@ -3,9 +3,11 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 
+#home = st.Page("home.py", title="Données Statistiques")
 st.set_page_config(
     page_title="Données Statistiques",
     page_icon="📈",
+    layout="wide"
 )
 
 from constantes import SEXE, MOIS, CATEGORIES_VEHICULES_GROUPE, TRAJET, GRAVITE, ATM, OBSM
@@ -24,7 +26,7 @@ def add_all_option(options):
     return options
 
 st.header("Statistiques sur les accidents corporels de la circulation routière")
-col1, col2= st.columns(2)
+
 
 #Le nombre d'accidents.
 nombreaccidentvehicule= dataVehicules['Num_Acc'].nunique()
@@ -55,10 +57,11 @@ monthAccident = dataCaracteristiques[['Accident_Id', 'mois']]
 nbAccidentByMonth = monthAccident.groupby(by='mois').count().reset_index()
 nbAccidentByMonth['mois'] = nbAccidentByMonth['mois'].map(MOIS)
 
+col1, col2 = st.columns([3,3])
 fig = px.line(nbAccidentByMonth, x='mois', y='Accident_Id', 
             labels={'mois': "mois", 'Accident_Id': "Nombre d'accidents"},
             title="Nombre d'accidents par mois")
-st.plotly_chart(fig, use_container_width=True)
+col1.plotly_chart(fig, use_container_width=True)
 
 #Graphique Courbe du nombre d'accident par jour de semaine 
 dataCaracteristiques['date'] = pd.to_datetime(dataCaracteristiques['an'].astype(str) + '-' + dataCaracteristiques['mois'].astype(str) + '-' + dataCaracteristiques['jour'].astype(str), format='%Y-%m-%d')
@@ -73,9 +76,9 @@ nbAccidentByWeekday = nbAccidentByDay.set_index('jour_semaine').reindex(jours_se
 fig = px.line(nbAccidentByWeekday, x='jour_semaine', y='Accident_Id', 
             labels={'jour_semaine': "Jour de semaine", 'Accident_Id': "Nombre d'accidents"},
             title="Nombre d'accidents par jour de semaine")
-st.plotly_chart(fig, use_container_width=True)
+col2.plotly_chart(fig, use_container_width=True)
 
-
+col1, col2 = st.columns([2,3])
 ##Nombre d'usager par gravité d'accident
 gravite=dataUsagers[['id_usager', 'grav']]
 gravite = gravite[gravite['grav'] > -1]
@@ -87,7 +90,7 @@ fignbrusager = px.bar(nbrusager, x='grav', y='id_usager',
                       labels={'grav': "Gravité", 'id_usager': "Nombre d'usager"},
                       title="Nombre d'usager par gravité d'accident")
    
-st.plotly_chart(fignbrusager)
+col1.plotly_chart(fignbrusager)
 
 #Graphique Courbe du nombre d'accident par catégorie de véhicule 
 categorie=dataVehicules[['Num_Acc', 'catv']]
@@ -97,7 +100,21 @@ categorieimplique['catv'] = categorieimplique['catv'].map(CATEGORIES_VEHICULES_G
 fig = px.pie(categorieimplique, values='Num_Acc', names='catv', title="Répartition du nombre d'accidents par type de véhicule")
 st.plotly_chart(fig)
 
+
+#La répartition des obstacles mobiles heurtés
+obstaclemob = dataVehicules[['Num_Acc', 'obsm']]
+obstaclemob = obstaclemob[obstaclemob['obsm'] > -1]
+resobstaclemob=obstaclemob.groupby(by='obsm').count().reset_index()
+ 
+resobstaclemob['obsm']= resobstaclemob['obsm'].map(OBSM)
+ 
+figobstaclemob = px.pie(resobstaclemob , values='Num_Acc', names='obsm',
+                         title="La répartition des obstacles mobiles heurtés")
+ 
+col2.plotly_chart(figobstaclemob)
+
 #Graphique histogramme du nombre d'accident par type de trajet 
+col1, col2 = st.columns([3,3])
 trajetAccident = dataUsagers[['Num_Acc', 'trajet']]
 nbAccidentByTrajet = trajetAccident.groupby(by='trajet').count().reset_index()
 nbAccidentByTrajet['trajet'] = nbAccidentByTrajet['trajet'].map(TRAJET)
@@ -105,7 +122,7 @@ nbAccidentByTrajet['trajet'] = nbAccidentByTrajet['trajet'].map(TRAJET)
 fig = px.bar(nbAccidentByTrajet, x='trajet', y='Num_Acc', 
             labels={'trajet': "Type de trajet", 'Num_Acc': "Nombre d'accidents"},
             title="Répartition des accidents par type de trajet")
-st.plotly_chart(fig, use_container_width=True)
+col1.plotly_chart(fig, use_container_width=True)
 
 #Graphique circulaire du nombre d'accident par sexe
 sexeAccident = dataUsagers[['Num_Acc', 'sexe']]
@@ -115,7 +132,7 @@ nbAccidentBySexe = sexeAccidentCleaned.groupby(by='sexe').count().reset_index()
 nbAccidentBySexe['sexe'] = nbAccidentBySexe['sexe'].map(SEXE)
 
 fig = px.pie(nbAccidentBySexe, values='Num_Acc', names='sexe', title='Répartition des usagers par sexe')
-st.plotly_chart(fig)
+col2.plotly_chart(fig)
 
 ## Nombre d'accident par condition atmospherique
 
@@ -130,15 +147,3 @@ figconditionatmo = px.bar(resconditionatmosph, x='Accident_Id', y='atm',
                               title="Nombre d'accident par condition atmospherique")
  
 st.plotly_chart(figconditionatmo)
-
-#La répartition des obstacles mobiles heurtés
-obstaclemob = dataVehicules[['Num_Acc', 'obsm']]
-obstaclemob = obstaclemob[obstaclemob['obsm'] > -1]
-resobstaclemob=obstaclemob.groupby(by='obsm').count().reset_index()
- 
-resobstaclemob['obsm']= resobstaclemob['obsm'].map(OBSM)
- 
-figobstaclemob = px.pie(resobstaclemob , values='Num_Acc', names='obsm',
-                         title="La répartition des obstacles mobiles heurtés")
- 
-st.plotly_chart(figobstaclemob)
