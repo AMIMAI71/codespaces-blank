@@ -3,14 +3,13 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 
-#home = st.Page("home.py", title="Données Statistiques")
+from constantes import SEXE, MOIS, CATEGORIES_VEHICULES_GROUPE, TRAJET, GRAVITE, ATM, OBSM
+
 st.set_page_config(
     page_title="Données Statistiques",
     page_icon="📈",
     layout="wide"
 )
-
-from constantes import SEXE, MOIS, CATEGORIES_VEHICULES_GROUPE, TRAJET, GRAVITE, ATM, OBSM
 
 dataUsagers = pd.read_csv("datas/usagers.csv", sep=";")
 dataVehicules = pd.read_csv("datas/vehicules.csv", sep=";")
